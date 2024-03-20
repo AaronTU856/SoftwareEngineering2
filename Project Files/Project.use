@@ -30,7 +30,9 @@ class BookingSystem
 
     cancel()
     begin
-      WriteLine('Customer cancelled selected booking');
+      Write('The booking made by ');
+      self.selected.getCustomerName();
+      WriteLine(' was cancelled');
       destroy self.selected 
     end
     
@@ -45,9 +47,8 @@ class BookingSystem
             notSelected -> selected { selectBooking() }
             selected -> selected { [self.selected.table.covers >= self.selected.covers] recordArrival() }
             selected -> selected { selectBooking() }
-            
+            selected -> notSelected { unSelectBooking() }
         end
-
 
 end
 
@@ -63,6 +64,10 @@ class Booking
     end
     
     showDetails()
+    begin
+    end
+
+    getCustomerName()
     begin
     end
     
@@ -87,13 +92,18 @@ class Reservation < Booking
         Write('Selected reservation is by ');
         WriteLine(self.customer.name)
     end
+
+    getCustomerName()
+    begin
+      Write(self.customer.name)
+    end
     
     setArrivalTime(t: Time)
     begin
         self.arrivalTime := t
     end
     
-    setCustomer( c : Customer) begin
+    setCustomer(c : Customer) begin
         insert(c, self) into Makes        
     end
 
@@ -121,7 +131,7 @@ class Table
   attributes
     tno : Integer
     covers : Integer
-    
+
 end
    
 
@@ -150,7 +160,7 @@ end
 
 association IsAt between 
     Booking[*] role bookings
-    Table[1]
+    Table[1] role table
 end
 
 association Makes between
@@ -170,8 +180,6 @@ end
 
 
 constraints
--- please exprees the contraint that no two bookings for a given
--- table can overlap
 
 context BookingSystem::recordArrival(hr: Integer, mn: Integer)
     pre arrivalBeforeBooking: self.selected.getTime() <= mn + hr*60
