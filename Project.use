@@ -27,12 +27,12 @@ class BookingSystem
         WriteLine('Customer has just been seated ');
         self.selected.showDetails()
     end
-
-    cancel()
-    begin
-      WriteLine('Customer cancelled selected booking');
-      destroy self.selected 
-    end
+	
+	cancel()
+	begin
+		 WriteLine('Customer has cancelled the selected reservation');
+		 destroy self.selected
+	end
     
     statemachines
         psm States
@@ -45,7 +45,6 @@ class BookingSystem
             notSelected -> selected { selectBooking() }
             selected -> selected { [self.selected.table.covers >= self.selected.covers] recordArrival() }
             selected -> selected { selectBooking() }
-            
         end
 
 
@@ -57,6 +56,8 @@ class Booking
     covers : Integer
     date : Date
     time : Time
+    payment : Cash
+    cardpayment : Card
   operations
     setArrivalTime(t: Time)
     begin
@@ -76,7 +77,34 @@ class Booking
 end
 
 class WalkIn < Booking
+  attributes
+    arrivalTime : Time
+  operations
+    recordArrival()
+    begin
+      Write('Selected walkin is by');
+    
+    end
+
+  setArrivalTime(t: Time)
+    begin
+        self.arrivalTime := t
+    end
+    
+
+    statemachines
+		psm States
+		states
+			newWalkIn : initial
+			waiting
+			seated
+		transitions
+			newWalkIn -> waiting { create }
+			waiting -> seated { recordArrival() }
+		end
+
 end
+
 
 class Reservation < Booking
   attributes
@@ -93,21 +121,21 @@ class Reservation < Booking
         self.arrivalTime := t
     end
     
-    setCustomer( c : Customer) begin
+    setCustomer( c : Customer) 
+    begin
         insert(c, self) into Makes        
     end
-
-    statemachines
-      psm States
-      states  
-        newReservation : initial
-        waiting
-        seated
-      transitions
-        newReservation -> waiting { create }
-        waiting -> seated { setArrivalTime() }
-      end
-
+	
+	statemachines
+		psm States
+		states
+			newReservation : initial
+			waiting
+			seated
+		transitions
+			newReservation -> waiting { create }
+			waiting -> seated { setArrivalTime() }
+		end
 end
 
 class Customer
@@ -124,6 +152,16 @@ class Table
     
 end
    
+class Cash
+  attributes
+    euro : Integer
+    cents : Integer
+end
+
+class Card
+  attributes
+    pin : Integer
+  end
 
    
 class Date
@@ -158,6 +196,23 @@ association Makes between
     Reservation[*] role reservations
 end
 
+association Arrive between
+    Customer[1]
+    WalkIn[*] role WalkIns
+end
+
+association Pays between
+    Customer[1]
+    Cash[*] role payment
+    
+end
+
+--association PayCard between
+    --Customer[1]
+    --Card[*] role payment
+--end
+
+
 association Contains between
     BookingSystem[1] role bs
     Booking[*] role current
@@ -176,8 +231,27 @@ constraints
 context BookingSystem::recordArrival(hr: Integer, mn: Integer)
     pre arrivalBeforeBooking: self.selected.getTime() <= mn + hr*60
 
-    pre arrivalBeforeBooking2: self.selected.table.covers >= self.selected.covers
 
+class PaymentSystem
+    attributes 
+        cash : Cash
+        card : Card
+    
+    operations      
+        selectPayment(booking: Booking, cashAmount: Integer, cardPin: Integer)
+        begin      
+            if (cashAmount > 0) then
+              self.cash.euro := cashAmount;
+              self.cash.cents := 0;
+              booking.payment := self.cash;             
+            end;
 
+            if (cardPin > 0) then
+                self.card.pin := cardPin;
+                booking.cardpayment := self.card;
+            end;
 
+            WriteLine('Payment processed sucessfully!');
+        end
+end
 
