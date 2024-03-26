@@ -107,6 +107,6 @@
 
 !new Order('order')
 
-!insert (cust,order) into HasOrdered
+!insert(c1,order) into HasOrdered
 
-
+!insert(c2, order) into HasOrdered

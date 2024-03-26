@@ -15,6 +15,7 @@ class BookingSystem
             end
         end
     end
+
     
     unSelectBooking()
     
@@ -34,6 +35,22 @@ class BookingSystem
 		 destroy self.selected
 	end
     
+  --Process payment operation
+  processPayment(booking: Booking, amount: Real, paymentMethod: String)
+  begin
+      -- Create a new Payment object
+      declare payment: Payment;
+      payment := new Payment;
+      payment.amount := amount;
+      payment.method := paymentMethod;
+
+      -- Associate the Payment with the Booking
+      insert(booking, payment) into Pay;
+
+      WriteLine('Payment processed successfully.');
+  end
+
+
     statemachines
         psm States
         states                        
@@ -163,9 +180,15 @@ end
 class Card
   attributes
     pin : Integer
-  end
+end
 
-   
+
+class Payment
+  attributes
+    amount : Real
+    method : String
+end
+
 class Date
   attributes
     day : Integer
@@ -224,6 +247,12 @@ association Selected between
     BookingSystem[1] role bsys
     Booking[0..1] role selected
 end
+
+association Pay between
+  Booking[*] role bookings
+  Payment[1] 
+end
+
 
 
 constraints
