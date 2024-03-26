@@ -67,6 +67,30 @@ class BookingSystem
 
 
 
+class PaymentSystem
+  attributes 
+    cash : Cash
+    card : Card
+  
+  operations      
+    selectPayment(booking: Booking, cashAmount: Integer, cardPin: Integer)
+    begin      
+        if (cashAmount > 0) then
+          self.cash.euro := cashAmount;
+          self.cash.cents := 0;
+          booking.payment := self.cash;             
+        end;
+
+        if (cardPin > 999 and cardPin < 10000) then  -- Check if PIN is 4 digits
+            self.card.pin := cardPin;
+            booking.cardpayment := self.card;
+            WriteLine('Payment processed successfully.');
+        else
+            WriteLine('Invalid PIN. Please enter a 4-digit PIN.');
+        end;
+    end
+end
+
 class Booking
   attributes
     covers : Integer
@@ -226,11 +250,19 @@ association Arrive between
     WalkIn[*] role WalkIns
 end
 
-association Pays between
+
+
+association PaysCash between
     Customer[1]
     Cash[*] role payment
-    
 end
+
+association HasCard between
+    Customer[1]
+    Card[*] role cards
+end
+
+
 
 --association PayCard between
     --Customer[1]
@@ -263,28 +295,6 @@ context BookingSystem::recordArrival(hr: Integer, mn: Integer)
     pre arrivalBeforeBooking: self.selected.getTime() <= mn + hr*60
 
 
-class PaymentSystem
-    attributes 
-        cash : Cash
-        card : Card
-    
-    operations      
-        selectPayment(booking: Booking, cashAmount: Integer, cardPin: Integer)
-        begin      
-            if (cashAmount > 0) then
-              self.cash.euro := cashAmount;
-              self.cash.cents := 0;
-              booking.payment := self.cash;             
-            end;
-
-            if (cardPin > 0) then
-                self.card.pin := cardPin;
-                booking.cardpayment := self.card;
-            end;
-
-            WriteLine('Payment processed sucessfully!');
-        end
-end
 
 
 class Order

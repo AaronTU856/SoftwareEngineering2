@@ -110,3 +110,11 @@
 !insert(c1,order) into HasOrdered
 
 !insert(c2, order) into HasOrdered
+
+--Test Cases
+
+!bookSys.selectPayment(r1, 50, 0)
+--!bookSys.selectPayment(r2, 0, 1234)
+
+--!order.addLineItem(2, Steak)
+--!order.calculatePrice()
