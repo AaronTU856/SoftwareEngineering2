@@ -46,9 +46,8 @@ class BookingSystem
             selected -> selected { [self.selected.table.covers >= self.selected.covers] recordArrival() }
             selected -> selected { selectBooking() }
         end
+    end
 
-
-end
 
 
 class Booking
@@ -58,6 +57,8 @@ class Booking
     time : Time
     payment : Cash
     cardpayment : Card
+    price : Real
+
   operations
     setArrivalTime(t: Time)
     begin
@@ -70,8 +71,9 @@ class Booking
     setTime(t : Time)
     begin
         self.time := t
-    end
-    
+    end 
+
+  
     -- A query operation to retun the time of the booking in minutes
     getTime() : Integer = time.getTime()
 end
@@ -254,4 +256,105 @@ class PaymentSystem
             WriteLine('Payment processed sucessfully!');
         end
 end
+
+
+class Order
+  attributes
+    isPrepaid : Boolean init : false
+    number : String
+    price : Real init : 0
+
+  operations
+    addLineItem(quantity : Integer, p : Product)
+    begin
+        declare lineItem : OrderLine;
+        lineItem := new OrderLine;
+        insert(self,lineItem) into OrderContainsLine;               
+        
+        -- centralized control here, not very OO in spirit
+
+        lineItem.quantity := quantity;
+        p.updateStock(quantity);
+        insert (lineItem, p) into HasProduct                       
+    end
+    
+    calculatePrice() : Real
+    begin
+        declare item:OrderLine, upr:Real, pr:Real, q:Integer, p:Product;
+        
+        self.price := 0;
+        for item in self.lineItems do
+            -- even more centralized control as in Fowler chap 4 example
+            q := item.getQuantity();
+            p := item.getProduct();
+            upr := p.getUnitPrice();
+            pr := self.calculateBasePrice(q, upr);
+            
+            self.price := self.price + pr                               
+        end;
+        result:= self.price                   
+    end
+    
+    calculateBasePrice(q : Integer, unitPrice : Real) : Real
+    begin        
+        if q >= 3 then
+                result := q * unitPrice * 0.9   -- 10% off
+            else
+                result := q * unitPrice
+        end        
+    end    
+end
+
+
+class OrderLine
+  attributes
+    price : Real  init : 0
+    quantity : Integer
+  operations
+    getQuantity() : Integer
+    begin
+        result := self.quantity
+    end
+    
+    getProduct() : Product
+    begin
+        result := self.product
+    end
+    
+end
+
+class Product
+  attributes
+    name : String
+    price : Real
+    stockLevel : Integer init : 8
+    
+  operations
+    getUnitPrice() : Real
+    begin
+        result := self.price
+    end
+    
+    updateStock(q : Integer)
+    begin
+        self.stockLevel := self.stockLevel - q
+    end
+end
+
+association OrderContainsLine between
+  Order[1] role containingOrder
+  OrderLine[*] role lineItems
+end
+
+association HasOrdered between
+  Customer[1]
+  Order[*] role orders
+end
+
+association HasProduct between
+  OrderLine[*] role orderLines
+  Product[1] 
+end
+
+
 

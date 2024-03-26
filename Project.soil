@@ -24,11 +24,11 @@
 !new Customer('c1')
 !new Customer('c2')
 !new Customer('c3')
-!c1.name := 'Prudence'
+!c1.name := 'John Smith'
 !c1.phoneNumber := '087 123 4567'
 !c2.name := 'Aaron Baggot!'
 !c2.phoneNumber := 'C22716399'
-!c3.name := 'Destiny'
+!c3.name := 'Aniket'
 !c3.phoneNumber := '086 123 1234'
 
 
@@ -84,4 +84,29 @@
 !r2.setTime(t4)
 !r3.setTime(t5)
 
+!new Cash('cash')
+!cash.euro := 10
+!cash.cents := 50
+
 --bookSys.cancel(r2)
+
+
+
+!new Product('Steak')
+!Steak.name := 'Sirlion'
+!Sirlion.price := 30
+!new Product('Lamb')
+!Lamb.price := 20
+!Lamb.name := 'Irish'
+!new Product('Drink')
+!Drink.name := 'Wine'
+!Wine.price := 10
+!new Product('Desert')
+!Desert.price := 10
+!Desert.name := 'Cheese Cake'
+
+!new Order('order')
+
+!insert (cust,order) into HasOrdered
+
+
