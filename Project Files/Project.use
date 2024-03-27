@@ -18,6 +18,9 @@ class BookingSystem
 
     
     unSelectBooking()
+    begin
+      delete (self,self.selected) from Selected
+    end
     
     recordArrival(hr: Integer, mn: Integer)
     begin
@@ -62,6 +65,8 @@ class BookingSystem
             notSelected -> selected { selectBooking() }
             selected -> selected { [self.selected.table.covers >= self.selected.covers] recordArrival() }
             selected -> selected { selectBooking() }
+            selected -> notSelected { unSelectBooking() }
+            selected -> notSelected { cancel() }
         end
     end
 
@@ -106,6 +111,10 @@ class Booking
     end
     
     showDetails()
+    begin
+    end
+
+    getCustomerName()
     begin
     end
     
@@ -167,6 +176,11 @@ class Reservation < Booking
     setCustomer( c : Customer) 
     begin
         insert(c, self) into Makes        
+    end
+
+    getCustomerName()
+    begin
+      Write(self.customer.name)
     end
 	
 	statemachines
