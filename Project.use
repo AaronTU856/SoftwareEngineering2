@@ -1,0 +1,399 @@
+model BookingSys
+
+-- main control class
+
+class BookingSystem
+  attributes 
+    date : Date
+  
+  operations      
+    selectBooking(tno: Integer, hr: Integer, mn: Integer)
+    begin      
+        for r in self.current do
+            if (r.table.tno = tno and r.getTime() = hr*60+mn) then
+                insert(self,r) into Selected                
+            end
+        end
+    end
+
+    
+    unSelectBooking()
+    
+    recordArrival(hr: Integer, mn: Integer)
+    begin
+        declare t: Time;
+        t := new Time; 
+        t.setTime(hr, mn);
+        self.selected.setArrivalTime(t);
+        WriteLine('Customer has just been seated ');
+        self.selected.showDetails()
+    end
+	
+	cancel()
+	begin
+		 WriteLine('Customer has cancelled the selected reservation');
+		 destroy self.selected
+	end
+    
+  --Process payment operation
+  processPayment(booking: Booking, amount: Real, paymentMethod: String)
+  begin
+      -- Create a new Payment object
+      declare payment: Payment;
+      payment := new Payment;
+      payment.amount := amount;
+      payment.method := paymentMethod;
+
+      -- Associate the Payment with the Booking
+      insert(booking, payment) into Pay;
+
+      WriteLine('Payment processed successfully.');
+  end
+
+
+    statemachines
+        psm States
+        states                        
+            newBooking : initial
+            notSelected
+            selected
+        transitions
+            newBooking ->  notSelected  { create }
+            notSelected -> selected { selectBooking() }
+            selected -> selected { [self.selected.table.covers >= self.selected.covers] recordArrival() }
+            selected -> selected { selectBooking() }
+        end
+    end
+
+
+
+class PaymentSystem
+  attributes 
+    cash : Cash
+    card : Card
+  
+  operations      
+    selectPayment(booking: Booking, cashAmount: Integer, cardPin: Integer)
+    begin      
+        if (cashAmount > 0) then
+          self.cash.euro := cashAmount;
+          self.cash.cents := 0;
+          booking.payment := self.cash;             
+        end;
+
+        if (cardPin > 999 and cardPin < 10000) then  -- Check if PIN is 4 digits
+            self.card.pin := cardPin;
+            booking.cardpayment := self.card;
+            WriteLine('Payment processed successfully.');
+        else
+            WriteLine('Invalid PIN. Please enter a 4-digit PIN.');
+        end;
+    end
+end
+
+class Booking
+  attributes
+    covers : Integer
+    date : Date
+    time : Time
+    payment : Cash
+    cardpayment : Card
+    price : Real
+
+  operations
+    setArrivalTime(t: Time)
+    begin
+    end
+    
+    showDetails()
+    begin
+    end
+    
+    setTime(t : Time)
+    begin
+        self.time := t
+    end 
+
+  
+    -- A query operation to retun the time of the booking in minutes
+    getTime() : Integer = time.getTime()
+end
+
+class WalkIn < Booking
+  attributes
+    arrivalTime : Time
+  operations
+    recordArrival()
+    begin
+      Write('Selected walkin is by');
+    
+    end
+
+  setArrivalTime(t: Time)
+    begin
+        self.arrivalTime := t
+    end
+    
+
+    statemachines
+		psm States
+		states
+			newWalkIn : initial
+			waiting
+			seated
+		transitions
+			newWalkIn -> waiting { create }
+			waiting -> seated { recordArrival() }
+		end
+
+end
+
+
+class Reservation < Booking
+  attributes
+    arrivalTime : Time
+  operations
+    showDetails()
+    begin
+        Write('Selected reservation is by ');
+        WriteLine(self.customer.name)
+    end
+    
+    setArrivalTime(t: Time)
+    begin
+        self.arrivalTime := t
+    end
+    
+    setCustomer( c : Customer) 
+    begin
+        insert(c, self) into Makes        
+    end
+	
+	statemachines
+		psm States
+		states
+			newReservation : initial
+			waiting
+			seated
+		transitions
+			newReservation -> waiting { create }
+			waiting -> seated { setArrivalTime() }
+		end
+end
+
+class Customer
+  attributes
+    name : String
+    phoneNumber : String
+end
+
+
+class Table 
+  attributes
+    tno : Integer
+    covers : Integer
+    
+end
+   
+class Cash
+  attributes
+    euro : Integer
+    cents : Integer
+end
+
+class Card
+  attributes
+    pin : Integer
+end
+
+
+class Payment
+  attributes
+    amount : Real
+    method : String
+end
+
+class Date
+  attributes
+    day : Integer
+    month : Integer
+    year : Integer
+end
+
+class Time
+  attributes
+    hour : Integer
+    min : Integer
+  operations
+    setTime(h: Integer, m: Integer)
+    begin
+        self.hour := h;
+        self.min := m
+    end 
+    
+    -- a query method to return the time since midnight in minutes
+    getTime() : Integer = self.hour*60 + self.min      
+end   
+
+association IsAt between 
+    Booking[*] role bookings
+    Table[1]
+end
+
+association Makes between
+    Customer[1]
+    Reservation[*] role reservations
+end
+
+association Arrive between
+    Customer[1]
+    WalkIn[*] role WalkIns
+end
+
+
+
+association PaysCash between
+    Customer[1]
+    Cash[*] role payment
+end
+
+association HasCard between
+    Customer[1]
+    Card[*] role cards
+end
+
+
+
+--association PayCard between
+    --Customer[1]
+    --Card[*] role payment
+--end
+
+
+association Contains between
+    BookingSystem[1] role bs
+    Booking[*] role current
+end
+
+association Selected between
+    BookingSystem[1] role bsys
+    Booking[0..1] role selected
+end
+
+association Pay between
+  Booking[*] role bookings
+  Payment[1] 
+end
+
+
+
+constraints
+-- please exprees the contraint that no two bookings for a given
+-- table can overlap
+
+context BookingSystem::recordArrival(hr: Integer, mn: Integer)
+    pre arrivalBeforeBooking: self.selected.getTime() <= mn + hr*60
+
+
+
+
+class Order
+  attributes
+    isPrepaid : Boolean init : false
+    number : String
+    price : Real init : 0
+
+  operations
+    addLineItem(quantity : Integer, p : Product)
+    begin
+        declare lineItem : OrderLine;
+        lineItem := new OrderLine;
+        insert(self,lineItem) into OrderContainsLine;               
+        
+        -- centralized control here, not very OO in spirit
+
+        lineItem.quantity := quantity;
+        p.updateStock(quantity);
+        insert (lineItem, p) into HasProduct                       
+    end
+    
+    calculatePrice() : Real
+    begin
+        declare item:OrderLine, upr:Real, pr:Real, q:Integer, p:Product;
+        
+        self.price := 0;
+        for item in self.lineItems do
+            -- even more centralized control as in Fowler chap 4 example
+            q := item.getQuantity();
+            p := item.getProduct();
+            upr := p.getUnitPrice();
+            pr := self.calculateBasePrice(q, upr);
+            
+            self.price := self.price + pr                               
+        end;
+        result:= self.price                   
+    end
+    
+    calculateBasePrice(q : Integer, unitPrice : Real) : Real
+    begin        
+        if q >= 3 then
+                result := q * unitPrice * 0.9   -- 10% off
+            else
+                result := q * unitPrice
+        end        
+    end    
+end
+
+
+class OrderLine
+  attributes
+    price : Real  init : 0
+    quantity : Integer
+  operations
+    getQuantity() : Integer
+    begin
+        result := self.quantity
+    end
+    
+    getProduct() : Product
+    begin
+        result := self.product
+    end
+    
+end
+
+class Product
+  attributes
+    name : String
+    price : Real
+    stockLevel : Integer init : 8
+    
+  operations
+    getUnitPrice() : Real
+    begin
+        result := self.price
+    end
+    
+    updateStock(q : Integer)
+    begin
+        self.stockLevel := self.stockLevel - q
+    end
+end
+
+association OrderContainsLine between
+  Order[1] role containingOrder
+  OrderLine[*] role lineItems
+end
+
+association HasOrdered between
+  Customer[1]
+  Order[*] role orders
+end
+
+association HasProduct between
+  OrderLine[*] role orderLines
+  Product[1] 
+end
+
+
+
