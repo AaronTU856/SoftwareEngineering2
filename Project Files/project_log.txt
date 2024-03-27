@@ -1,6 +1,0 @@
-20/03/2024 
--updated cancel() method in class BookingSystem to show the name of the Customer that cancelled the booking
-
-25/03/2024
--added state "selected -> notSelected { cancel() }" to BookingSystem statemachine
--implemented unSelectBooking in class BookingSystem
