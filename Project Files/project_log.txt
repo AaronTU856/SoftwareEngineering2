@@ -1,6 +1,19 @@
+
 20/03/2024 
 -updated cancel() method in class BookingSystem to show the name of the Customer that cancelled the booking
+
+27/03/24
+-- Added payment method and payment BookingSystem
+-- Added a orderline and order for a menu system
 
 25/03/2024
 -added state "selected -> notSelected { cancel() }" to BookingSystem statemachine
 -implemented unSelectBooking in class BookingSystem
+
+03/04/2024
+-- Structured the report, detailed description into each section
+-- Screenshots of the original restaurant 
+-- Added a new folder for screenshots
+
+
+
