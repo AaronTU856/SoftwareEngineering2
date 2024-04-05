@@ -24,11 +24,11 @@
 !new Customer('c1')
 !new Customer('c2')
 !new Customer('c3')
-!c1.name := 'John Smith'
-!c1.phoneNumber := '087 123 4567'
+!c1.name := 'Aniket Bedade'
+!c1.phoneNumber := 'C22448826'
 !c2.name := 'Aaron Baggot!'
 !c2.phoneNumber := 'C22716399'
-!c3.name := 'Aniket'
+!c3.name := 'John Smith'
 !c3.phoneNumber := '086 123 1234'
 
 
