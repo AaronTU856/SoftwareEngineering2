@@ -34,8 +34,10 @@ class BookingSystem
 	
 	cancel()
 	begin
-		 WriteLine('Customer has cancelled the selected reservation');
-		 destroy self.selected
+		  Write('The booking made by ');
+      self.selected.getCustomerName();
+      WriteLine(' was cancelled');
+      destroy self.selected
 	end
     
   --Process payment operation
