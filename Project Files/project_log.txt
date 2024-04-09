@@ -19,3 +19,6 @@
 -- Added screenshots for Booking System State Machine
 -- Added screenshots of Object Diagram when testing methods
 -- removed processPayment() method from BookingSys
+
+09/04/2024
+-- Added screenshots for Reservation State Machine
