@@ -16,7 +16,6 @@ class BookingSystem
         end
     end
 
-    
     unSelectBooking()
     begin
       delete (self,self.selected) from Selected
@@ -31,30 +30,32 @@ class BookingSystem
         WriteLine('Customer has just been seated ');
         self.selected.showDetails()
     end
+
+    cancel()
+    begin
+        Write('The booking made by ');
+        self.selected.getCustomerName();
+        WriteLine(' was cancelled');
+        destroy self.selected
+    end
 	
-	cancel()
-	begin
-		  Write('The booking made by ');
-      self.selected.getCustomerName();
-      WriteLine(' was cancelled');
-      destroy self.selected
-	end
-    
-  --Process payment operation
-  processPayment(booking: Booking, amount: Real, paymentMethod: String)
-  begin
-      -- Create a new Payment object
-      declare payment: Payment;
-      payment := new Payment;
-      payment.amount := amount;
-      payment.method := paymentMethod;
+    -- version of cancel not defined in SOIL
+    cancel(r : Reservation)
 
-      -- Associate the Payment with the Booking
-      insert(booking, payment) into Pay;
+    --Process payment operation
+    processPayment(booking: Booking, amount: Real, paymentMethod: String)
+    begin
+        -- Create a new Payment object
+        declare payment: Payment;
+        payment := new Payment;
+        payment.amount := amount;
+        payment.method := paymentMethod;
 
-      WriteLine('Payment processed successfully.');
-  end
+        -- Associate the Payment with the Booking
+        insert(booking, payment) into Pay;
 
+        WriteLine('Payment processed successfully.');
+    end
 
     statemachines
         psm States
@@ -69,6 +70,7 @@ class BookingSystem
             selected -> selected { selectBooking() }
             selected -> notSelected { unSelectBooking() }
             selected -> notSelected { cancel() }
+            notSelected -> notSelected { cancel() }
         end
     end
 
@@ -170,14 +172,19 @@ class Reservation < Booking
         WriteLine(self.customer.name)
     end
     
-    setArrivalTime(t: Time)
+    setArrivalTime(t : Time)
     begin
         self.arrivalTime := t
     end
     
-    setCustomer( c : Customer) 
+    setCustomer(c : Customer) 
     begin
         insert(c, self) into Makes        
+    end
+
+    setCovers(cv : Integer)
+    begin
+      self.covers := cv
     end
 
     getCustomerName()
@@ -201,6 +208,26 @@ class Customer
   attributes
     name : String
     phoneNumber : String
+  operations
+    makeReservation(covers : Integer, bookingHr : Integer, bookingMin : Integer)
+    begin
+      declare time : Time, reservation : Reservation;
+      time := new Time;
+      time.setTime(bookingHr, bookingMin);
+
+      reservation := new Reservation;
+      reservation.setCovers(covers);
+      reservation.setTime(time);
+      reservation.setCustomer(self);
+
+      --insert(bs, reservation) into Contains;
+
+      WriteLine('Reservation made successfully.');
+    end
+
+    walkIn()
+    begin
+    end
 end
 
 
@@ -209,6 +236,17 @@ class Table
     tno : Integer
     covers : Integer
     
+  statemachines
+    psm States
+    states
+      newTable : initial
+      available
+      reserved
+      occupied
+    transitions
+      newTable -> available { create }
+      --available -> reserved { }
+    end
 end
    
 class Cash
@@ -309,6 +347,10 @@ constraints
 
 context BookingSystem::recordArrival(hr: Integer, mn: Integer)
     pre arrivalBeforeBooking: self.selected.getTime() <= mn + hr*60
+
+context BookingSystem::cancel(r : Reservation)
+  pre Pre1: current->includes(r)
+  post Post1: current->excludes(r)
 
 
 

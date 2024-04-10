@@ -22,3 +22,9 @@
 
 09/04/2024
 -- Added screenshots for Reservation State Machine
+
+10/04/2024
+-- Added makeReservation method to class Customer
+-- Added statemachine to class Table
+-- Added pre and post conditions for cancel()
+-- Added screenshots of operation testing on cancel()
