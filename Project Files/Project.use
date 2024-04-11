@@ -3,16 +3,14 @@ model BookingSys
 -- main control class
 
 class BookingSystem
-  attributes 
-    date : Date
   
   operations      
     selectBooking(tno: Integer, hr: Integer, mn: Integer)
     begin      
         for r in self.current do
-            if (r.table.tno = tno and r.getTime() = hr*60+mn) then
-                insert(self,r) into Selected                
-            end
+          if (r.table.tno = tno and r.getTime() = hr*60+mn) then
+            insert(self,r) into Selected                
+          end
         end
     end
 
@@ -42,21 +40,6 @@ class BookingSystem
     -- version of cancel not defined in SOIL
     cancel(r : Reservation)
 
-    --Process payment operation
-    processPayment(booking: Booking, amount: Real, paymentMethod: String)
-    begin
-        -- Create a new Payment object
-        declare payment: Payment;
-        payment := new Payment;
-        payment.amount := amount;
-        payment.method := paymentMethod;
-
-        -- Associate the Payment with the Booking
-        insert(booking, payment) into Pay;
-
-        WriteLine('Payment processed successfully.');
-    end
-
     statemachines
         psm States
         states                        
@@ -75,39 +58,10 @@ class BookingSystem
     end
 
 
-
-class PaymentSystem
-  attributes 
-    cash : Cash
-    card : Card
-  
-  operations      
-    selectPayment(booking: Booking, cashAmount: Integer, cardPin: Integer)
-    begin      
-        if (cashAmount > 0) then
-          self.cash.euro := cashAmount;
-          self.cash.cents := 0;
-          booking.payment := self.cash;             
-        end;
-
-        if (cardPin > 999 and cardPin < 10000) then  -- Check if PIN is 4 digits
-            self.card.pin := cardPin;
-            booking.cardpayment := self.card;
-            WriteLine('Payment processed successfully.');
-        else
-            WriteLine('Invalid PIN. Please enter a 4-digit PIN.');
-        end;
-    end
-end
-
 class Booking
   attributes
     covers : Integer
-    date : Date
     time : Time
-    payment : Cash
-    cardpayment : Card
-    price : Real
 
   operations
     setArrivalTime(t: Time)
@@ -204,12 +158,13 @@ class Reservation < Booking
 		end
 end
 
+
 class Customer
   attributes
     name : String
     phoneNumber : String
   operations
-    makeReservation(covers : Integer, bookingHr : Integer, bookingMin : Integer)
+    makeReservation(covers : Integer, table : Table, bookingHr : Integer, bookingMin : Integer)
     begin
       declare time : Time, reservation : Reservation;
       time := new Time;
@@ -221,6 +176,7 @@ class Customer
       reservation.setCustomer(self);
 
       --insert(bs, reservation) into Contains;
+      insert(reservation, table) into IsAt;
 
       WriteLine('Reservation made successfully.');
     end
@@ -248,31 +204,7 @@ class Table
       --available -> reserved { }
     end
 end
-   
-class Cash
-  attributes
-    euro : Integer
-    cents : Integer
-end
 
-class Card
-  attributes
-    pin : Integer
-end
-
-
-class Payment
-  attributes
-    amount : Real
-    method : String
-end
-
-class Date
-  attributes
-    day : Integer
-    month : Integer
-    year : Integer
-end
 
 class Time
   attributes
@@ -304,26 +236,6 @@ association Arrive between
     WalkIn[*] role WalkIns
 end
 
-
-
-association PaysCash between
-    Customer[1]
-    Cash[*] role payment
-end
-
-association HasCard between
-    Customer[1]
-    Card[*] role cards
-end
-
-
-
---association PayCard between
-    --Customer[1]
-    --Card[*] role payment
---end
-
-
 association Contains between
     BookingSystem[1] role bs
     Booking[*] role current
@@ -333,12 +245,6 @@ association Selected between
     BookingSystem[1] role bsys
     Booking[0..1] role selected
 end
-
-association Pay between
-  Booking[*] role bookings
-  Payment[1] 
-end
-
 
 
 constraints
@@ -352,106 +258,13 @@ context BookingSystem::cancel(r : Reservation)
     pre Pre1: current->includes(r)
     post Post1: current->excludes(r)
 
+context Table
+  inv noOverlap: self.bookings->forAll(b1, b2 | b1.getTime() + 120 <= b2.getTime() or b2.getTime() + 120 <= b1.getTime())
+
+context BookingSystem
+  inv mustBeOneOf: not self.selected.isDefined() or self.current->includes(self.selected)
 
 
-
-class Order
-  attributes
-    isPrepaid : Boolean init : false
-    number : String
-    price : Real init : 0
-
-  operations
-    addLineItem(quantity : Integer, p : Product)
-    begin
-        declare lineItem : OrderLine;
-        lineItem := new OrderLine;
-        insert(self,lineItem) into OrderContainsLine;               
-        
-        -- centralized control here, not very OO in spirit
-
-        lineItem.quantity := quantity;
-        p.updateStock(quantity);
-        insert (lineItem, p) into HasProduct                       
-    end
-    
-    calculatePrice() : Real
-    begin
-        declare item:OrderLine, upr:Real, pr:Real, q:Integer, p:Product;
-        
-        self.price := 0;
-        for item in self.lineItems do
-            -- even more centralized control as in Fowler chap 4 example
-            q := item.getQuantity();
-            p := item.getProduct();
-            upr := p.getUnitPrice();
-            pr := self.calculateBasePrice(q, upr);
-            
-            self.price := self.price + pr                               
-        end;
-        result:= self.price                   
-    end
-    
-    calculateBasePrice(q : Integer, unitPrice : Real) : Real
-    begin        
-        if q >= 3 then
-                result := q * unitPrice * 0.9   -- 10% off
-            else
-                result := q * unitPrice
-        end        
-    end    
-end
-
-
-class OrderLine
-  attributes
-    price : Real  init : 0
-    quantity : Integer
-  operations
-    getQuantity() : Integer
-    begin
-        result := self.quantity
-    end
-    
-    getProduct() : Product
-    begin
-        result := self.product
-    end
-    
-end
-
-class Product
-  attributes
-    name : String
-    price : Real
-    stockLevel : Integer init : 8
-    
-  operations
-    getUnitPrice() : Real
-    begin
-        result := self.price
-    end
-    
-    updateStock(q : Integer)
-    begin
-        self.stockLevel := self.stockLevel - q
-    end
-end
-
-association OrderContainsLine between
-  Order[1] role containingOrder
-  OrderLine[*] role lineItems
-end
-
-association HasOrdered between
-  Customer[1]
-  Order[*] role orders
-end
-
-association HasProduct between
-  OrderLine[*] role orderLines
-  Product[1] 
-end
 
 
 
