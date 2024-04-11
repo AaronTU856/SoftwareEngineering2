@@ -31,7 +31,7 @@ class BookingSystem
         self.selected.showDetails()
     end
 
-    cancel()
+    cancelReservation()
     begin
         Write('The booking made by ');
         self.selected.getCustomerName();
@@ -69,8 +69,8 @@ class BookingSystem
             selected -> selected { [self.selected.table.covers >= self.selected.covers] recordArrival() }
             selected -> selected { selectBooking() }
             selected -> notSelected { unSelectBooking() }
-            selected -> notSelected { cancel() }
-            notSelected -> notSelected { cancel() }
+            --selected -> notSelected { cancel() }
+            --notSelected -> notSelected { cancel() }
         end
     end
 
@@ -349,8 +349,8 @@ context BookingSystem::recordArrival(hr: Integer, mn: Integer)
     pre arrivalBeforeBooking: self.selected.getTime() <= mn + hr*60
 
 context BookingSystem::cancel(r : Reservation)
-  pre Pre1: current->includes(r)
-  post Post1: current->excludes(r)
+    pre Pre1: current->includes(r)
+    post Post1: current->excludes(r)
 
 
 
