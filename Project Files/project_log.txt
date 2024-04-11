@@ -32,3 +32,4 @@
 11/04/2024
 -- Removed PaymentSystem related classes and objects
 -- Added two invariants
+-- Completed Report with screenshots and highlighted what is needed to complete
