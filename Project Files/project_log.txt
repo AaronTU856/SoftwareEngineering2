@@ -36,3 +36,5 @@
 
 12/04/2024
 -- Added screenshots of sequence diagrams for cancelReservation() and recordArrival() and added them to report
+-- Added changeTable() method to BookingSystem
+-- Added checkAvailability() query method to Table

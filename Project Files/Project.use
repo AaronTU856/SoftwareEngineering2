@@ -5,13 +5,13 @@ model BookingSys
 class BookingSystem
   
   operations      
-    selectBooking(tno: Integer, hr: Integer, mn: Integer)
+    selectBooking(tno : Integer, hr : Integer, mn : Integer)
     begin      
-        for r in self.current do
-          if (r.table.tno = tno and r.getTime() = hr*60+mn) then
-            insert(self,r) into Selected                
-          end
+      for r in self.current do
+        if (r.table.tno = tno and r.getTime() = hr*60+mn) then
+          insert(self,r) into Selected                
         end
+      end
     end
 
     unSelectBooking()
@@ -19,43 +19,53 @@ class BookingSystem
       delete (self,self.selected) from Selected
     end
     
-    recordArrival(hr: Integer, mn: Integer)
+    recordArrival(hr : Integer, mn : Integer)
     begin
-        declare t: Time;
-        t := new Time; 
-        t.setTime(hr, mn);
-        self.selected.setArrivalTime(t);
-        WriteLine('Customer has just been seated ');
-        self.selected.showDetails()
+      declare t: Time;
+      t := new Time; 
+      t.setTime(hr, mn);
+      self.selected.setArrivalTime(t);
+      WriteLine('Customer has just been seated ');
+      self.selected.showDetails()
     end
 
     cancelReservation()
     begin
-        Write('The booking made by ');
-        self.selected.getCustomerName();
-        WriteLine(' was cancelled');
-        destroy self.selected
+      Write('The booking made by ');
+      self.selected.getCustomerName();
+      WriteLine(' was cancelled');
+      destroy self.selected
+    end
+
+    changeTable(r : Reservation, table : Table)
+    begin
+      if (table.checkAvailability(r.time)) then
+        delete (r, r.table) from IsAt;
+        insert(r, table) into IsAt
+      else
+        WriteLine('Table is not Available')
+      end
     end
 	
     -- version of cancel not defined in SOIL
     cancel(r : Reservation)
 
-    statemachines
-        psm States
-        states                        
-            newBooking : initial
-            notSelected
-            selected
-        transitions
-            newBooking ->  notSelected  { create }
-            notSelected -> selected { selectBooking() }
-            selected -> selected { [self.selected.table.covers >= self.selected.covers] recordArrival() }
-            selected -> selected { selectBooking() }
-            selected -> notSelected { unSelectBooking() }
-            selected -> notSelected { cancelReservation() }
-            notSelected -> notSelected { cancel() }
-        end
+  statemachines
+    psm States
+    states                        
+      newBooking : initial
+      notSelected
+      selected
+    transitions
+      newBooking ->  notSelected  { create }
+      notSelected -> selected { selectBooking() }
+      selected -> selected { [self.selected.table.covers >= self.selected.covers] recordArrival() }
+      selected -> selected { selectBooking() }
+      selected -> notSelected { unSelectBooking() }
+      selected -> notSelected { cancelReservation() }
+      notSelected -> notSelected { cancel() }
     end
+  end
 
 
 class Booking
@@ -89,6 +99,7 @@ end
 class WalkIn < Booking
   attributes
     arrivalTime : Time
+
   operations
     recordArrival()
     begin
@@ -101,17 +112,16 @@ class WalkIn < Booking
         self.arrivalTime := t
     end
     
-
-    statemachines
-		psm States
-		states
-			newWalkIn : initial
-			waiting
-			seated
-		transitions
-			newWalkIn -> waiting { create }
-			waiting -> seated { recordArrival() }
-		end
+  statemachines
+  psm States
+  states
+    newWalkIn : initial
+    waiting
+    seated
+  transitions
+    newWalkIn -> waiting { create }
+    waiting -> seated { recordArrival() }
+  end
 
 end
 
@@ -162,28 +172,37 @@ end
 class Customer
   attributes
     name : String
+    age : Integer
     phoneNumber : String
   operations
     makeReservation(covers : Integer, table : Table, bookingHr : Integer, bookingMin : Integer)
     begin
-      declare time : Time, reservation : Reservation;
+      declare time : Time, r : Reservation;
       time := new Time;
       time.setTime(bookingHr, bookingMin);
 
-      reservation := new Reservation;
-      reservation.setCovers(covers);
-      reservation.setTime(time);
-      reservation.setCustomer(self);
+      if (table.checkAvailability(time)) then
+        r := new Reservation;
+        r.setCovers(covers);
+        r.setTime(time);
+        r.setCustomer(self);
 
-      --insert(bs, reservation) into Contains;
-      insert(reservation, table) into IsAt;
+        -- add the new reservation to the BookingSystem
+        insert(self.bs, r) into Contains;
+        insert(r, table) into IsAt;
 
-      WriteLine('Reservation made successfully.');
+        WriteLine('Reservation made successfully.')
+      else
+        WriteLine('Table is not available.');
+        destroy time
+      end
     end
 
     walkIn()
     begin
     end
+
+
 end
 
 
@@ -191,18 +210,10 @@ class Table
   attributes
     tno : Integer
     covers : Integer
-    
-  statemachines
-    psm States
-    states
-      newTable : initial
-      available
-      reserved
-      occupied
-    transitions
-      newTable -> available { create }
-      --available -> reserved { }
-    end
+
+  operations
+    -- query operation to check if table is free
+    checkAvailability(t : Time) : Boolean = self.bookings->size() = 0 or self.bookings->forAll(b | b.getTime() + 120 <= t.getTime() or t.getTime() + 120 <= b.getTime())
 end
 
 
@@ -213,8 +224,8 @@ class Time
   operations
     setTime(h: Integer, m: Integer)
     begin
-        self.hour := h;
-        self.min := m
+      self.hour := h;
+      self.min := m
     end 
     
     -- a query method to return the time since midnight in minutes
@@ -246,6 +257,11 @@ association Selected between
     Booking[0..1] role selected
 end
 
+association Uses between
+  BookingSystem[1] role bs
+  Customer[1]
+end
+
 
 constraints
 
@@ -255,6 +271,14 @@ context BookingSystem::recordArrival(hr: Integer, mn: Integer)
 context BookingSystem::cancel(r : Reservation)
     pre Pre1: current->includes(r)
     post Post1: current->excludes(r)
+
+context BookingSystem::changeTable(r : Reservation, table : Table)
+  pre overNoOfCovers: r.covers <= table.covers
+  pre Pre1: r.table->excludes(table)
+  post Post1: r.table->includes(table)
+
+context Customer::makeReservation(covers : Integer, table : Table, bookingHr : Integer, bookingMin : Integer)
+  pre underageBookingTime: self.age < 18 and bookingHr * 60 + bookingMin < 21 * 60
 
 context Table
   inv noOverlap: self.bookings->forAll(b1, b2 | b1.getTime() + 120 <= b2.getTime() or b2.getTime() + 120 <= b1.getTime())
