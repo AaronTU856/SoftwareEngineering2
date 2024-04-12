@@ -52,8 +52,8 @@ class BookingSystem
             selected -> selected { [self.selected.table.covers >= self.selected.covers] recordArrival() }
             selected -> selected { selectBooking() }
             selected -> notSelected { unSelectBooking() }
-            --selected -> notSelected { cancel() }
-            --notSelected -> notSelected { cancel() }
+            selected -> notSelected { cancelReservation() }
+            notSelected -> notSelected { cancel() }
         end
     end
 
@@ -248,8 +248,6 @@ end
 
 
 constraints
--- please exprees the contraint that no two bookings for a given
--- table can overlap
 
 context BookingSystem::recordArrival(hr: Integer, mn: Integer)
     pre arrivalBeforeBooking: self.selected.getTime() <= mn + hr*60

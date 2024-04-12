@@ -51,16 +51,6 @@
 !insert (r2,tb2) into IsAt
 !insert (w2,tb2) into IsAt
 
-!new Date('today')
-!today.year := 2022
-!today.month := 3
-!today.day := 9
-!bookSys.date := today
-!r1.date := today
-!r2.date := today
-!r3.date := today
-
-
 !new Time('t1')
 !new Time('t2')
 !new Time('t3')
@@ -83,82 +73,3 @@
 !r1.setTime(t3)
 !r2.setTime(t4)
 !r3.setTime(t5)
-
-!new Cash('cash')
-!cash.euro := 10
-!cash.cents := 50
-
---bookSys.cancel(r2)
-
-
-
-!new Product('Steak')
-!Steak.name := 'Sirlion'
-!Sirlion.price := 30
-!new Product('Lamb')
-!Lamb.price := 20
-!Lamb.name := 'Irish'
-!new Product('Drink')
-!Drink.name := 'Wine'
-!Wine.price := 10
-!new Product('Desert')
-!Desert.price := 10
-!Desert.name := 'Cheese Cake'
-
---!new Order('order')
-
---!insert(c1,order) into HasOrdered
-
---insert(c2, order) into HasOrdered
-
---Test Cases
-
---!bookSys.selectPayment(r1, 50, 0)
---!bookSys.selectPayment(r2, 0, 1234)
-
---!order.addLineItem(2, Steak)
---!order.calculatePrice()
-
--- Add more items to the menu
---!new Product('Pasta')
---!Pasta.name := 'Spaghetti Carbonara'
---!SpaghettiCarbonara.price := 15
-
---!new Product('Chicken')
---!Chicken.name := 'Grilled Chicken Breast'
---!GrilledChickenBreast.price := 18
-
---!new Product('Seafood')
---!Seafood.name := 'Seafood Paella'
---!SeafoodPaella.price := 25
-
--- Define additional orders
---!new Order('order2')
---!insert(c2, order2) into HasOrdered
-
---!new Order('order3')
---!insert(c3, order3) into HasOrdered
-
--- Add items to orders
---!order.addLineItem(2, Steak)
---!order.addLineItem(1, Lamb)
---!order.addLineItem(3, Drink)
---!order.addLineItem(1, Desert)
-
---!order2.addLineItem(1, Pasta)
---!order2.addLineItem(2, Chicken)
---!order2.addLineItem(1, Drink)
---!order2.addLineItem(1, Desert)
-
---!order3.addLineItem(1, Seafood)
---!order3.addLineItem(2, Pasta)
---!order3.addLineItem(2, Chicken)
---!order3.addLineItem(2, Drink)
---!order3.addLineItem(1, Desert)
-
--- Calculate prices for orders
---!order.calculatePrice()
---!order2.calculatePrice()
---!order3.calculatePrice()
-
-
