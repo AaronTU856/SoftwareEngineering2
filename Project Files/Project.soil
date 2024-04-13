@@ -20,9 +20,12 @@
 !insert(bookSys, r2) into Contains
 !insert(bookSys, r3) into Contains
 
+
 !new Customer('c1')
 !new Customer('c2')
 !new Customer('c3')
+!new Customer('c4')
+
 !c1.name := 'Aniket Bedade'
 !c1.phoneNumber := 'C22448826'
 !c1.age := 17
@@ -32,7 +35,9 @@
 !c3.name := 'John Smith'
 !c3.phoneNumber := '086 123 1234'
 !c3.age := 25
-
+!c4.name := 'Tommy Bowe'
+!c4.phoneNumber := '087 12346674'
+!c4.age := 30
 
 !r1.setCustomer(c1)
 !r2.setCustomer(c2)
@@ -82,3 +87,4 @@
 !insert(bookSys, c1) into Uses
 !insert(bookSys, c2) into Uses
 !insert(bookSys, c3) into Uses
+
