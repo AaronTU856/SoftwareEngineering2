@@ -85,42 +85,83 @@ class Booking
     getCustomerName()
     begin
     end
-    
+
+    setCovers(cv : Integer)
+    begin
+      self.covers := cv
+    end
+
     setTime(t : Time)
     begin
         self.time := t
     end 
 
-  
     -- A query operation to retun the time of the booking in minutes
     getTime() : Integer = time.getTime()
 end
 
-class WalkIn < Booking
-  attributes
-    arrivalTime : Time
-
+class Receptionist
   operations
-    recordArrival()
+    greetWalkIn(covers : Integer, hr : Integer, min : Integer)
     begin
-      Write('Selected walkin is by');
-    
+      declare w : WalkIn, t : Time;
+      t := new Time;
+      t.setTime(hr, min);
+
+      w := new WalkIn;
+      w.setCovers(covers);
+      w.setTime(t);
+
+      insert(self, w) into Talking;
+
+      WriteLine('Welcome! You will be seated in a moment.')
     end
 
-  setArrivalTime(t: Time)
+    seatWalkIn()
     begin
-        self.arrivalTime := t
+      declare run : Boolean;
+      run := true;
+      for tb in self.table do
+        if (run and tb.checkAvailability(self.current.time) and self.current.covers <= tb.covers) then
+          insert(self.current, tb) into IsAt;
+          self.current.seated();
+          WriteLine('Please have a seat here');
+          delete(self, self.current) from Talking;
+          run := false
+        end
+      end;
+
+      if (run) then
+        WriteLine('Im sorry, there are no tables available.');
+        self.current.notSeated();
+        destroy self.current
+      end
     end
-    
+end
+
+class WalkIn < Booking
+
+  -- dummy operations to change states in statemachine
+  operations
+  seated()
+  begin
+  end
+
+  notSeated()
+  begin
+  end
+
   statemachines
   psm States
   states
     newWalkIn : initial
     waiting
     seated
+    left
   transitions
     newWalkIn -> waiting { create }
-    waiting -> seated { recordArrival() }
+    waiting -> seated { seated() }
+    waiting -> left { notSeated() }
   end
 
 end
@@ -144,11 +185,6 @@ class Reservation < Booking
     setCustomer(c : Customer) 
     begin
         insert(c, self) into Makes        
-    end
-
-    setCovers(cv : Integer)
-    begin
-      self.covers := cv
     end
 
     getCustomerName()
@@ -197,12 +233,6 @@ class Customer
         destroy time
       end
     end
-
-    walkIn()
-    begin
-    end
-
-
 end
 
 
@@ -242,9 +272,14 @@ association Makes between
     Reservation[*] role reservations
 end
 
-association Arrive between
-    Customer[1]
-    WalkIn[*] role WalkIns
+association Talking between
+    Receptionist[1]
+    WalkIn[1] role current
+end
+
+association Checks between
+  Receptionist[1]
+  Table[*]
 end
 
 association Contains between

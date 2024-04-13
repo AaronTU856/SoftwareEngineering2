@@ -12,8 +12,8 @@
     <node height="14.0" id="newWalkIn" sizeCalculated="false" type="PseudoStateNode" width="14.0">
         <name>newWalkIn</name>
         <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>11.584202473201755</x>
-            <y>20.431189924019712</y>
+            <x>86.58420247320176</x>
+            <y>63.43118992401972</y>
         </strategy>
         <node id="newWalkIn::StateName" sizeCalculated="true" type="StateName">
             <name>newWalkIn</name>
@@ -33,24 +33,82 @@
         </node>
         <hidden>false</hidden>
     </node>
-    <node id="seated" sizeCalculated="true" type="StateNode">
-        <name>seated</name>
-        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>322.21715276749285</x>
-            <y>89.48821513128968</y>
-        </strategy>
-        <showInvariant>true</showInvariant>
-        <hidden>false</hidden>
-    </node>
     <node id="waiting" sizeCalculated="true" type="StateNode">
         <name>waiting</name>
         <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>77.59060572021455</x>
-            <y>87.89992515102459</y>
+            <x>43.59060572021457</x>
+            <y>116.8999251510246</y>
         </strategy>
         <showInvariant>true</showInvariant>
         <hidden>false</hidden>
     </node>
+    <node id="seated" sizeCalculated="true" type="StateNode">
+        <name>seated</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>327.21715276749285</x>
+            <y>116.48821513128968</y>
+        </strategy>
+        <showInvariant>true</showInvariant>
+        <hidden>false</hidden>
+    </node>
+    <node id="left" sizeCalculated="true" type="StateNode">
+        <name>left</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>327.843882549671</x>
+            <y>206.63304941738215</y>
+        </strategy>
+        <showInvariant>true</showInvariant>
+        <hidden>false</hidden>
+    </node>
+    <edge type="Transition">
+        <source>waiting</source>
+        <target>left</target>
+        <name>notSeated()/</name>
+        <waypoints>
+            <edgeproperty id="transition::waiting::left::::WayPoint::0" sizeCalculated="true" type="WayPoint" userDefined="false" visible="true">
+                <name>0</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyAttachedIntersection">
+                    <userOffsetX>0.0</userOffsetX>
+                    <userOffsetY>0.0</userOffsetY>
+                </strategy>
+                <id>0</id>
+                <specialid>1</specialid>
+                <hidden>false</hidden>
+            </edgeproperty>
+            <edgeproperty id="transition::waiting::left::::WayPoint::1" sizeCalculated="true" type="WayPoint" userDefined="false" visible="true">
+                <name>1</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyAttachedIntersection">
+                    <userOffsetX>0.0</userOffsetX>
+                    <userOffsetY>0.0</userOffsetY>
+                </strategy>
+                <id>1</id>
+                <specialid>2</specialid>
+                <hidden>false</hidden>
+            </edgeproperty>
+        </waypoints>
+        <hidden>false</hidden>
+        <Transitions>
+            <Transition>
+                <trigger>notSeated()</trigger>
+                <guard/>
+                <post/>
+                <edgeproperty id="notSeated()/" sizeCalculated="true" type="TransitionLabel" userDefined="true" visible="true">
+                    <name>notSeated()/</name>
+                    <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
+                        <userOffsetX>-4.0</userOffsetX>
+                        <userOffsetY>6.0</userOffsetY>
+                        <offsetX>0.0</offsetX>
+                        <offsetY>10.0</offsetY>
+                        <related length="2">
+                            <related0>transition::waiting::left::::WayPoint::0</related0>
+                            <related1>transition::waiting::left::::WayPoint::1</related1>
+                        </related>
+                    </strategy>
+                    <hidden>false</hidden>
+                </edgeproperty>
+            </Transition>
+        </Transitions>
+    </edge>
     <edge type="Transition">
         <source>newWalkIn</source>
         <target>waiting</target>
@@ -83,11 +141,11 @@
                 <trigger>create</trigger>
                 <guard/>
                 <post/>
-                <edgeproperty id="create/" sizeCalculated="true" type="TransitionLabel" userDefined="false" visible="true">
+                <edgeproperty id="create/" sizeCalculated="true" type="TransitionLabel" userDefined="true" visible="true">
                     <name>create/</name>
                     <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
-                        <userOffsetX>0.0</userOffsetX>
-                        <userOffsetY>0.0</userOffsetY>
+                        <userOffsetX>25.0</userOffsetX>
+                        <userOffsetY>-13.0</userOffsetY>
                         <offsetX>0.0</offsetX>
                         <offsetY>10.0</offsetY>
                         <related length="2">
@@ -103,7 +161,7 @@
     <edge type="Transition">
         <source>waiting</source>
         <target>seated</target>
-        <name>recordArrival()/</name>
+        <name>seated()/</name>
         <waypoints>
             <edgeproperty id="transition::waiting::seated::::WayPoint::0" sizeCalculated="true" type="WayPoint" userDefined="false" visible="true">
                 <name>0</name>
@@ -129,11 +187,11 @@
         <hidden>false</hidden>
         <Transitions>
             <Transition>
-                <trigger>recordArrival()</trigger>
+                <trigger>seated()</trigger>
                 <guard/>
                 <post/>
-                <edgeproperty id="recordArrival()/" sizeCalculated="true" type="TransitionLabel" userDefined="false" visible="true">
-                    <name>recordArrival()/</name>
+                <edgeproperty id="seated()/" sizeCalculated="true" type="TransitionLabel" userDefined="false" visible="true">
+                    <name>seated()/</name>
                     <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
                         <userOffsetX>0.0</userOffsetX>
                         <userOffsetY>0.0</userOffsetY>
