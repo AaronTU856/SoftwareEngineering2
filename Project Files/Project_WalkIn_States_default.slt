@@ -9,6 +9,33 @@
         <showrolenames>true</showrolenames>
         <showgrid>false</showgrid>
     </diagramOptions>
+    <node id="waiting" sizeCalculated="true" type="StateNode">
+        <name>waiting</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>43.59060572021457</x>
+            <y>116.8999251510246</y>
+        </strategy>
+        <showInvariant>true</showInvariant>
+        <hidden>false</hidden>
+    </node>
+    <node id="left" sizeCalculated="true" type="StateNode">
+        <name>left</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>327.843882549671</x>
+            <y>206.63304941738215</y>
+        </strategy>
+        <showInvariant>true</showInvariant>
+        <hidden>false</hidden>
+    </node>
+    <node id="seated" sizeCalculated="true" type="StateNode">
+        <name>seated</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>327.21715276749285</x>
+            <y>116.48821513128968</y>
+        </strategy>
+        <showInvariant>true</showInvariant>
+        <hidden>false</hidden>
+    </node>
     <node height="14.0" id="newWalkIn" sizeCalculated="false" type="PseudoStateNode" width="14.0">
         <name>newWalkIn</name>
         <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
@@ -31,33 +58,6 @@
             </strategy>
             <hidden>false</hidden>
         </node>
-        <hidden>false</hidden>
-    </node>
-    <node id="waiting" sizeCalculated="true" type="StateNode">
-        <name>waiting</name>
-        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>43.59060572021457</x>
-            <y>116.8999251510246</y>
-        </strategy>
-        <showInvariant>true</showInvariant>
-        <hidden>false</hidden>
-    </node>
-    <node id="seated" sizeCalculated="true" type="StateNode">
-        <name>seated</name>
-        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>327.21715276749285</x>
-            <y>116.48821513128968</y>
-        </strategy>
-        <showInvariant>true</showInvariant>
-        <hidden>false</hidden>
-    </node>
-    <node id="left" sizeCalculated="true" type="StateNode">
-        <name>left</name>
-        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>327.843882549671</x>
-            <y>206.63304941738215</y>
-        </strategy>
-        <showInvariant>true</showInvariant>
         <hidden>false</hidden>
     </node>
     <edge type="Transition">

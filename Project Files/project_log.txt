@@ -44,7 +44,6 @@
 -- Test cases Object Diagram Change Table Success
 -- Test cases Object Diagram Change Table Fail
 -- Restructured the Project Report
-
-14/04/2024
 -- Added class Receptionist
 -- Added operations to handle WalkIns
+-- Added screenshots relating to WalkIns

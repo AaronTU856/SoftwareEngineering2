@@ -1,3 +1,5 @@
+-- Aniket Bedade C22448826
+-- Aaron Baggot C22716399
 model BookingSys
 
 -- main control class
@@ -163,7 +165,6 @@ class WalkIn < Booking
     waiting -> seated { seated() }
     waiting -> left { notSeated() }
   end
-
 end
 
 
@@ -229,6 +230,7 @@ class Customer
 
         WriteLine('Reservation made successfully.')
       else
+        -- delete the new Time object
         WriteLine('Table is not available.');
         destroy time
       end
