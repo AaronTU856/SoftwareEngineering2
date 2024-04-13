@@ -25,7 +25,6 @@
 !new Customer('c1')
 !new Customer('c2')
 !new Customer('c3')
-!new Customer('c4')
 
 !c1.name := 'Aniket Bedade'
 !c1.phoneNumber := 'C22448826'
