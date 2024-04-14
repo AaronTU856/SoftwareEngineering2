@@ -95,7 +95,7 @@ class Booking
 
     setTime(t : Time)
     begin
-        self.time := t
+      self.time := t
     end 
 
     -- A query operation to retun the time of the booking in minutes
@@ -265,18 +265,18 @@ class Time
 end   
 
 association IsAt between 
-    Booking[*] role bookings
-    Table[1]
+  Booking[*] role bookings
+  Table[1]
 end
 
 association Makes between
-    Customer[1]
-    Reservation[*] role reservations
+  Customer[1]
+  Reservation[*] role reservations
 end
 
 association Talking between
-    Receptionist[1]
-    WalkIn[1] role current
+  Receptionist[1]
+  WalkIn[1] role current
 end
 
 association Checks between
@@ -285,13 +285,13 @@ association Checks between
 end
 
 association Contains between
-    BookingSystem[1] role bs
-    Booking[*] role current
+  BookingSystem[1] role bs
+  Booking[*] role current
 end
 
 association Selected between
-    BookingSystem[1] role bsys
-    Booking[0..1] role selected
+  BookingSystem[1] role bsys
+  Booking[0..1] role selected
 end
 
 association Uses between
@@ -303,11 +303,11 @@ end
 constraints
 
 context BookingSystem::recordArrival(hr: Integer, mn: Integer)
-    pre arrivalBeforeBooking: self.selected.getTime() <= mn + hr*60
+  pre arrivalBeforeBooking: self.selected.getTime() <= mn + hr*60
 
 context BookingSystem::cancel(r : Reservation)
-    pre Pre1: current->includes(r)
-    post Post1: current->excludes(r)
+  pre Pre1: current->includes(r)
+  post Post1: current->excludes(r)
 
 context BookingSystem::changeTable(r : Reservation, table : Table)
   pre overNoOfCovers: r.covers <= table.covers
