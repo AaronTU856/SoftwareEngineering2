@@ -47,3 +47,7 @@
 -- Added class Receptionist
 -- Added operations to handle WalkIns
 -- Added screenshots relating to WalkIns
+
+14/04/2024
+--Screenshots added to report
+--Explanations added to the report
