@@ -50,7 +50,7 @@
 !tb4.tno := 4
 !tb1.covers := 4
 !tb2.covers := 2
-!tb3.covers := 2
+!tb3.covers := 4
 !tb4.covers := 6
 
 !insert (w1,tb1) into IsAt
