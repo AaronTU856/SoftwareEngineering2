@@ -312,7 +312,7 @@ context BookingSystem::cancel(r : Reservation)
 context BookingSystem::changeTable(r : Reservation, table : Table)
   pre overNoOfCovers: r.covers <= table.covers
   pre Pre1: r.table->excludes(table)
-  post Post1: r.table->includes(table)
+  post Post1: r.table->includes(table) or not table.checkAvailability(r.time)
 
 context Customer::makeReservation(covers : Integer, table : Table, bookingHr : Integer, bookingMin : Integer)
   pre underageBookingTime: self.age < 18 and bookingHr * 60 + bookingMin < 21 * 60
