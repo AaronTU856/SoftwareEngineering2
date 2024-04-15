@@ -174,18 +174,18 @@ class Reservation < Booking
   operations
     showDetails()
     begin
-        Write('Selected reservation is by ');
-        WriteLine(self.customer.name)
+      Write('Selected reservation is by ');
+      WriteLine(self.customer.name)
     end
     
     setArrivalTime(t : Time)
     begin
-        self.arrivalTime := t
+      self.arrivalTime := t
     end
     
     setCustomer(c : Customer) 
     begin
-        insert(c, self) into Makes        
+      insert(c, self) into Makes        
     end
 
     getCustomerName()
